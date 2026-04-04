@@ -21,7 +21,7 @@ Just double-click `run-webrtc.bat` — it does everything:
 - Installs dependencies
 - Launches the app
 
-That's it!
+That's it! You only need 2 files: `alpha-webrtc.py` and `run-webrtc.bat`.
 
 ### Option 2: Manual
 
