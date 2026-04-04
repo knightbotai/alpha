@@ -17,15 +17,21 @@ import numpy as np
 from fastrtc import Stream, ReplyOnPause, audio_to_bytes, aggregate_bytes_to_16bit
 
 # === Configuration ===
-# Update these with your Cloudflare tunnel URLs
-WHISPER_URL = os.getenv("WHISPER_URL", "https://fastwhisp-dist-v3.tacimpulse.net/v1/audio/transcriptions")
-VLLM_URL = os.getenv("VLLM_URL", "https://vllm.tacimpulse.net/v1/chat/completions")
+# LOCAL addresses (faster!) - use these if services are on same machine
+WHISPER_URL = os.getenv("WHISPER_URL", "http://localhost:8001/v1/audio/transcriptions")
+VLLM_URL = os.getenv("VLLM_URL", "http://localhost:8000/v1/chat/completions")
 VLLM_MODEL = os.getenv("VLLM_MODEL", "huihui-qwen35-27b-abliterated-nvfp4")
-KOKORO_URL = os.getenv("KOKORO_URL", "https://koko-tts.tacimpulse.net/v1/audio/speech")
+KOKORO_URL = os.getenv("KOKORO_URL", "http://localhost:8880/v1/audio/speech")
 KOKORO_VOICE = os.getenv("KOKORO_VOICE", "af_v0nicole+af_v0bella")
+
+# Cloudflare fallback (for remote access - slower!)
+# WHISPER_URL = "https://fastwhisp-dist-v3.tacimpulse.net/v1/audio/transcriptions"
+# VLLM_URL = "https://vllm.tacimpulse.net/v1/chat/completions"
+# KOKORO_URL = "https://koko-tts.tacimpulse.net/v1/audio/speech"
 
 # Chat history
 chat_history = []
+is_processing = False  # Flag to prevent generator conflicts
 
 
 def transcribe(audio_tuple):
@@ -126,32 +132,45 @@ def text_to_speech(text):
 
 def handler(audio):
     """Main handler - STT -> LLM -> TTS"""
+    global is_processing
+    
+    # Skip if already processing (prevents generator conflicts)
+    if is_processing:
+        print("Already processing, skipping input")
+        return
+    
     # Step 1: Transcribe
     text = transcribe(audio)
     if not text or len(text.strip()) < 2:
         print("Empty or too short, skipping")
         return
     
-    # Avoid echo loops - check if this is very similar to last response
+    # Check for echo/loop
     if chat_history and chat_history[-1].get("role") == "assistant":
-        last_response = chat_history[-1].get("content", "")
-        # If very similar to last response, add a modifier to make it different
-        if text.lower().strip() == last_response.lower().strip():
-            text = text + " "  # Add space to trigger different response
+        last_response = chat_history[-1].get("content", "").lower()
+        if text.lower().strip() == last_response.strip():
+            print("Same as last response, adding variation")
+            text = text + " (continuing)"
     
     print(f"You: {text}")
     
-    # Step 2: Generate response
-    response = generate_response(text)
-    if not response:
-        print("No response generated")
-        return
+    # Set flag to prevent concurrent processing
+    is_processing = True
     
-    print(f"Alpha: {response}")
-    
-    # Step 3: Synthesize speech
-    for audio_chunk in text_to_speech(response):
-        yield audio_chunk
+    try:
+        # Step 2: Generate response
+        response = generate_response(text)
+        if not response:
+            print("No response generated")
+            return
+        
+        print(f"Alpha: {response}")
+        
+        # Step 3: Synthesize speech
+        for audio_chunk in text_to_speech(response):
+            yield audio_chunk
+    finally:
+        is_processing = False
 
 
 # Create the stream with VAD tuning
@@ -166,19 +185,12 @@ if __name__ == "__main__":
     print("\n" + "="*50)
     print("🎙️  Alpha WebRTC - Real-time Voice")
     print("="*50)
-    print("\nMake sure these services are running:")
+    print("\nUsing LOCAL services (fast!):")
     print(f"  - Whisper: {WHISPER_URL}")
     print(f"  - vLLM: {VLLM_URL}")
     print(f"  - Kokoro: {KOKORO_URL}")
     print("\nOpen http://localhost:7860 in Chrome/Edge")
     print("Click Start, then speak!\n")
-    print("\nThis will open a web interface where you can")
-    print("speak and hear Alpha in real-time!")
-    print("\nMake sure your Cloudflare tunnels are running:")
-    print(f"  - Whisper: {WHISPER_URL}")
-    print(f"  - vLLM: {VLLM_URL}")
-    print(f"  - Kokoro: {KOKORO_URL}")
-    print("\nPress Ctrl+C to stop.\n")
     
     # Launch the UI
     stream.ui.launch()
