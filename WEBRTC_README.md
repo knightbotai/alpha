@@ -14,22 +14,30 @@ Real-time voice conversation with Alpha through your browser! No phone calls, no
 
 ## Setup
 
-### 1. Install FastRTC
+### Option 1: Super Simple (Recommended)
 
-Open PowerShell or Command Prompt and run:
+Just double-click `run-webrtc.bat` — it does everything:
+- Creates a virtual environment (if needed)
+- Installs dependencies
+- Launches the app
+
+That's it!
+
+### Option 2: Manual
+
+If you prefer doing it yourself:
 
 ```powershell
+# Create venv
+python -m venv venv
+
+# Activate
+venv\Scripts\activate
+
+# Install
 pip install "fastrtc[vad, tts]" numpy requests
-```
 
-### 2. Get the Code
-
-Clone the repo or just download `alpha-webrtc.py` from:
-https://github.com/knightbotai/alpha/blob/master/scripts/alpha-webrtc.py
-
-### 3. Run It!
-
-```powershell
+# Run
 python alpha-webrtc.py
 ```
 
