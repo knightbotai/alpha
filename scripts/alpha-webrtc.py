@@ -145,7 +145,8 @@ def handler(audio):
         yield audio_chunk
 
 
-# Create the stream
+# Create the stream with VAD tuning
+# Mode options: "noise", "standard", "sensitive" - default is "standard"
 stream = Stream(
     handler=ReplyOnPause(handler),
     modality="audio",
