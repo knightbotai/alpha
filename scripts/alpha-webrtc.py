@@ -134,15 +134,19 @@ def handler(audio):
 stream = Stream(
     handler=ReplyOnPause(handler),
     modality="audio",
-    mode="send-receive",
-    title="Alpha WebRTC",
-    description="Real-time voice chat with Alpha"
+    mode="send-receive"
 )
 
 if __name__ == "__main__":
     print("\n" + "="*50)
-    print("🎙️  Alpha WebRTC Prototype")
+    print("🎙️  Alpha WebRTC - Real-time Voice")
     print("="*50)
+    print("\nMake sure these services are running:")
+    print(f"  - Whisper: {WHISPER_URL}")
+    print(f"  - vLLM: {VLLM_URL}")
+    print(f"  - Kokoro: {KOKORO_URL}")
+    print("\nOpen http://localhost:7860 in Chrome/Edge")
+    print("Click Start, then speak!\n")
     print("\nThis will open a web interface where you can")
     print("speak and hear Alpha in real-time!")
     print("\nMake sure your Cloudflare tunnels are running:")
