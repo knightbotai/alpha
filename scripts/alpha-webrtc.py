@@ -128,14 +128,23 @@ def handler(audio):
     """Main handler - STT -> LLM -> TTS"""
     # Step 1: Transcribe
     text = transcribe(audio)
-    if not text:
+    if not text or len(text.strip()) < 2:
+        print("Empty or too short, skipping")
         return
+    
+    # Avoid echo loops - check if this is very similar to last response
+    if chat_history and chat_history[-1].get("role") == "assistant":
+        last_response = chat_history[-1].get("content", "")
+        # If very similar to last response, add a modifier to make it different
+        if text.lower().strip() == last_response.lower().strip():
+            text = text + " "  # Add space to trigger different response
     
     print(f"You: {text}")
     
     # Step 2: Generate response
     response = generate_response(text)
     if not response:
+        print("No response generated")
         return
     
     print(f"Alpha: {response}")
