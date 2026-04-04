@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+OpenSpace/
+
+# Large files
+memory_vectors.json
+tts-output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# OpenClaw runtime
+.openclaw/
+
+# Logs
+*.log
+
+# Media
+media/

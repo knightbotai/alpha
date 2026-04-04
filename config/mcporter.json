@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "openspace": {
+      "command": "openspace-mcp",
+      "env": {
+        "OPENSPACE_WORKSPACE": "/root/.openclaw/workspace/OpenSpace",
+        "OPENSPACE_HOST_SKILL_DIRS": "/root/.openclaw/workspace/skills",
+        "OPENSPACE_MODEL": "openai/huihui-qwen35-27b-abliterated-nvfp4",
+        "OPENSPACE_LLM_API_BASE": "https://vllm.tacimpulse.net/v1",
+        "OPENSPACE_LLM_API_KEY": "not-needed",
+        "OPENSPACE_BACKEND_SCOPE": "shell,mcp,system"
+      }
+    }
+  },
+  "imports": []
+}

@@ -1,0 +1,7 @@
+{
+  "origin": "captured",
+  "parent_skill_ids": [],
+  "change_summary": "Captured a pattern for handling simple greeting tasks through direct text responses without tool invocation.",
+  "created_by": "openspace",
+  "tags": []
+}

@@ -1,0 +1,36 @@
+# ============================================================
+# Kokoro-FastAPI Docker Compose Setup
+# GPU-accelerated TTS for Alpha
+# ============================================================
+# Run with: docker compose up -d
+# ============================================================
+
+services:
+  kokoro-tts:
+    image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+    container_name: kokoro-tts
+    restart: unless-stopped
+    ports:
+      - "8880:8880"
+    volumes:
+      - kokoro-models:/app/api/src/models
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8880/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  kokoro-models:
+    name: kokoro-tts-models
