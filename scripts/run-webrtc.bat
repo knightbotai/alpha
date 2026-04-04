@@ -23,7 +23,8 @@ echo [2/3] Activating environment...
 call venv\Scripts\activate.bat
 
 REM Install dependencies if needed
-pip install "fastrtc[vad, tts]" numpy requests >nul 2>&1
+echo Installing dependencies...
+pip install "fastrtc[vad, tts]" numpy requests scipy soundfile >nul 2>&1
 echo [3/3] Dependencies ready!
 echo.
 

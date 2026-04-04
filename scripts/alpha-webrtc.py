@@ -97,16 +97,31 @@ def text_to_speech(text):
     
     try:
         resp = requests.post(KOKORO_URL, json=payload, timeout=30)
+        print(f"Kokoro response status: {resp.status_code}")
         if resp.status_code == 200:
-            # Kokoro returns raw audio, yield it in chunks
+            # Kokoro returns raw audio (MP3), need to decode properly
             audio_data = resp.content
-            # Convert to 24kHz numpy array chunks
-            audio_array = np.frombuffer(audio_data, dtype=np.int16).reshape(1, -1)
-            yield (24000, audio_array)
+            print(f"Kokoro audio size: {len(audio_data)} bytes")
+            
+            # Try using scipy to convert MP3 to raw PCM
+            try:
+                from scipy.io import wavfile
+                import io
+                # Use soundfile instead for better MP3 support
+                import soundfile as sf
+                # Read MP3 data
+                audio_array, sample_rate = sf.read(io.BytesIO(audio_data), dtype='int16')
+                print(f"Decoded: {sample_rate}Hz, {len(audio_array)} samples")
+                yield (sample_rate, audio_array.T)  # Transpose for FastRTC format
+            except ImportError:
+                # Fallback: if no scipy/soundfile, yield raw and let FastRTC handle it
+                print("scipy/soundfile not available, trying direct yield")
+                audio_array = np.frombuffer(audio_data, dtype=np.uint8)
+                yield (24000, audio_array.reshape(1, -1))
         else:
-            print(f"Kokoro error: {resp.status_code} - {resp.text}")
+            print(f"Kokoro error: {resp.status_code} - {resp.text[:200]}")
     except Exception as e:
-        print(f"Kokoro error: {e}")
+        print(f"Kokoro exception: {e}")
 
 
 def handler(audio):
