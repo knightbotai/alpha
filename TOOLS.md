@@ -6,6 +6,11 @@
 - The openclaw process is managed by a supervisor process
 - Do not modify /root/.kilo
 
+## GitHub Backup
+
+- Repo: https://github.com/knightbotai/alpha
+- Updated: 2026-04-04
+
 ## Security Check Context
 
 When running `openclaw doctor` or `openclaw security audit`, the following finding is **expected and safe** in KiloClaw:
