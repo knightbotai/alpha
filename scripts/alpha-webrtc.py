@@ -17,11 +17,54 @@ import numpy as np
 from fastrtc import Stream, ReplyOnPause, audio_to_bytes, aggregate_bytes_to_16bit
 
 # === Configuration ===
-# LOCAL addresses (faster!) - use these if services are on same machine
-WHISPER_URL = os.getenv("WHISPER_URL", "http://localhost:8001/v1/audio/transcriptions")
-VLLM_URL = os.getenv("VLLM_URL", "http://localhost:8000/v1/chat/completions")
+# Try LOCAL first (faster!), fall back to Cloudflare if needed
+
+def get_urls():
+    """Get URLs - try local first, fallback to cloudflare"""
+    # Local URLs
+    local_whisper = "http://localhost:8001/v1/audio/transcriptions"
+    local_vllm = "http://localhost:8000/v1/chat/completions"
+    local_kokoro = "http://localhost:8880/v1/audio/speech"
+    
+    # Cloudflare fallback
+    cf_whisper = "https://fastwhisp-dist-v3.tacimpulse.net/v1/audio/transcriptions"
+    cf_vllm = "https://vllm.tacimpulse.net/v1/chat/completions"
+    cf_kokoro = "https://koko-tts.tacimpulse.net/v1/audio/speech"
+    
+    # Check if local services are available, otherwise use cloudflare
+    import requests
+    whisper_url = local_whisper
+    vllm_url = local_vllm
+    kokoro_url = local_kokoro
+    
+    print("Checking services...")
+    try:
+        r = requests.get("http://localhost:8000/v1/models", timeout=2)
+        print("✓ vLLM local OK")
+    except:
+        print("✗ vLLM local failed, using Cloudflare")
+        vllm_url = cf_vllm
+    
+    try:
+        r = requests.get("http://localhost:8880/", timeout=2)
+        print("✓ Kokoro local OK")
+    except:
+        print("✗ Kokoro local failed, using Cloudflare")
+        kokoro_url = cf_kokoro
+    
+    try:
+        r = requests.get("http://localhost:8001/", timeout=2)
+        print("✓ Whisper local OK")
+    except:
+        print("✗ Whisper local failed, using Cloudflare")
+        whisper_url = cf_whisper
+    
+    return whisper_url, vllm_url, kokoro_url
+
+WHISPER_URL, VLLM_URL, KOKORO_URL = get_urls()
+
+# Model config
 VLLM_MODEL = os.getenv("VLLM_MODEL", "huihui-qwen35-27b-abliterated-nvfp4")
-KOKORO_URL = os.getenv("KOKORO_URL", "http://localhost:8880/v1/audio/speech")
 KOKORO_VOICE = os.getenv("KOKORO_VOICE", "af_v0nicole+af_v0bella")
 
 # Cloudflare fallback (for remote access - slower!)
