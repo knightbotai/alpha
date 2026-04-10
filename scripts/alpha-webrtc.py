@@ -103,7 +103,7 @@ def generate_response(text):
     payload = {
         "model": VLLM_MODEL,
         "messages": messages,
-        "max_tokens": 800,  # Increased for longer stories
+        "max_tokens": 500,  # Reduced to prevent timeout
         "temperature": 0.8
     }
     
