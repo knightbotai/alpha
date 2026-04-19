@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  coqui-xtts:
+    image: ghcr.io/coqui-ai/tts:latest
+    container_name: coqui-xtts
+    restart: unless-stopped
+    ports:
+      - "5002:5002"
+    environment:
+      - TTS_MODEL_NAME=xtts_v2
+    volumes:
+      - D:/coqui-xtts/models:/root/.local/share/tts  # Store models on D drive to persist across restarts
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: python3 TTS/server/server.py --model_name xtts_v2 --host 0.0.0.0
+
+# Usage on Windows (PowerShell):
+# 1. Create folder on D drive: New-Item -ItemType Directory -Path D:\coqui-xtts
+# 2. Run: docker-compose up -d
+#
+# To clone a voice (3+ seconds of audio):
+# curl -X POST http://localhost:5002/clone \
+#   -F "audio_file=@your_voice_sample.wav" \
+#   -F "reference_text=text_spoken_in_audio"
+#
+# To synthesize speech:
+# curl -X POST http://localhost:5002/synthesize \
+#   -H "Content-Type: application/json" \
+#   -d '{"text": "Hello world", "voice_id": "your_voice_id"}'

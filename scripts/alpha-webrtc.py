@@ -25,7 +25,7 @@ VLLM_CF = "https://vllm.tacimpulse.net/v1/chat/completions"
 KOKORO_LOCAL = "http://localhost:8880/v1/audio/speech"
 KOKORO_CF = "https://koko-tts.tacimpulse.net/v1/audio/speech"
 
-VLLM_MODEL = "huihui-qwen35-27b-abliterated-nvfp4"
+VLLM_MODEL = "huihui-qwen35-35b-a3b-abliterated-nvfp4"
 KOKORO_VOICE = "af_v0nicole+af_v0bella"
 
 # System prompt to give the model Alpha's personality

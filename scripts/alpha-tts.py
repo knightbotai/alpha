@@ -6,10 +6,10 @@ import os
 import time
 import requests
 
-# Kokoro endpoint (via Cloudflare tunnel)
+# Kokoro endpoint (via Cloudflare tunnel - WORKS!)
 KOKORO_URL = "https://koko-tts.tacimpulse.net/v1/audio/speech"
 KOKORO_MODEL = "kokoro"
-KOKORO_VOICE = "af_v0nicole+af_v0bella"  # Alpha's signature voice (Nicole + Bella)
+KOKORO_VOICE = "af_sky"  # Default voice - simple and reliable
 
 # Edge TTS fallback
 EDGE_VOICE = "en-US-AriaNeural"
@@ -81,8 +81,10 @@ def main():
             outfile = generate_edge(text, voice)
         print(outfile)
     except Exception as e:
+        print(f"[ALPHA-TTS] Kokoro failed: {e}", file=sys.stderr)
         # Fallback to Edge if Kokoro fails
         if provider == "kokoro":
+            print(f"[ALPHA-TTS] Falling back to Edge TTS...", file=sys.stderr)
             try:
                 outfile = generate_edge(text, voice)
                 print(outfile)

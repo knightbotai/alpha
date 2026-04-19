@@ -1,0 +1,19 @@
+# Alpha Pipecat Bot - Python Dependencies
+# For Windows, install with: pip install -r requirements.txt
+
+# Core Pipecat dependencies
+pipecat-ai>=0.0.100
+pipecat-ai[webRTC]>=0.0.100
+
+# Local service dependencies
+aiohttp>=3.9.0
+
+# VAD (voice activity detection)
+silero-vad>=0.0.3
+
+# Optional: For better audio processing
+numpy>=1.24.0
+soundfile>=0.12.0
+
+# Daily.co transport (included in pipecat[webRTC] but explicit for clarity)
+daily>=0.0.0

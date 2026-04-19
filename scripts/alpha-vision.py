@@ -6,7 +6,7 @@ import base64
 import json
 
 VLLM_URL = "https://vllm.tacimpulse.net/v1/chat/completions"
-MODEL = "huihui-qwen35-27b-abliterated-nvfp4"
+MODEL = "huihui-qwen35-35b-a3b-abliterated-nvfp4"
 
 def analyze(image_path, prompt="Describe this image in detail. Be specific and accurate."):
     with open(image_path, 'rb') as f:
